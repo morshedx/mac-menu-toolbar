@@ -22,6 +22,16 @@ temp  [CPU] 22%  ↑ 1.0K
 | RAM | Memory usage % |
 | ↑ / ↓ | Upload / download speed, auto-scaled (B / K / M / G) |
 
+## Requirements & Limitations
+
+| | |
+|-|--|
+| **macOS** | 13 (Ventura) or later |
+| **Architecture** | Apple Silicon only (arm64) — Intel Macs not supported |
+| **Gatekeeper** | Ad-hoc signed, not notarized — right-click → Open on first launch |
+| **Temperature** | Reads SMC via IOKit; tested on M1/M2. May not work on all chips |
+| **Permissions** | Not sandboxed — requires IOKit access for temperature sensor |
+
 ## Build from Source
 
 **Requirements:** macOS 13+, Xcode Command Line Tools
