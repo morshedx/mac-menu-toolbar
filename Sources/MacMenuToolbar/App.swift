@@ -71,21 +71,29 @@ struct MenuBarLabel: View {
     @ObservedObject var stats: StatsViewModel
 
     var body: some View {
-        HStack(spacing: 5) {
-            HStack(spacing: 8) {
-
-                HStack(spacing: 5) {
-                    LucideIconView(name: "memory-stick", size: 15)
-                    Text("\(Int(stats.memoryUsage))%")
-                        .frame(width: 36, alignment: .leading)
-                }
-                HStack(spacing: 5) {
-                    LucideIconView(name: "cpu", size: 15)
-                    Text("\(Int(stats.cpuUsage))%")
-                        .frame(width: 36, alignment: .leading)
+        HStack(spacing: 6) {
+            VStack(spacing: 0) {
+                HStack(spacing: 3) {
+                    LucideIconView(name: "thermometer", size: 11)
+                    Text(stats.cpuTemp.map { "\(Int($0))°" } ?? "--°")
+                        .frame(width: 34, alignment: .leading)
                 }
             }
-            .font(.system(size: 13, weight: .regular, design: .monospaced))
+            .font(.system(size: 11, weight: .regular, design: .monospaced))
+
+            VStack(spacing: 0) {
+                HStack(spacing: 3) {
+                    LucideIconView(name: "cpu", size: 11)
+                    Text("\(Int(stats.cpuUsage))%")
+                        .frame(width: 34, alignment: .leading)
+                }
+                HStack(spacing: 3) {
+                    LucideIconView(name: "memory-stick", size: 11)
+                    Text("\(Int(stats.memoryUsage))%")
+                        .frame(width: 34, alignment: .leading)
+                }
+            }
+            .font(.system(size: 11, weight: .regular, design: .monospaced))
 
             VStack(spacing: 0) {
                 HStack(spacing: 3) {
@@ -99,7 +107,7 @@ struct MenuBarLabel: View {
                         .frame(width: 44, alignment: .leading)
                 }
             }
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+            .font(.system(size: 11, weight: .regular, design: .monospaced))
         }
         .foregroundColor(.primary)
         .fixedSize()

@@ -3,10 +3,16 @@ import Foundation
 
 final class TemperatureSampler {
     private let appleSiliconKeys = [
+        // M1
         "Tp01", "Tp05", "Tp09", "Tp0D", "Tp0H", "Tp0L",
-        "Tp0P", "Tp0T", "Tp0X", "Tp0b", "Tp0f", "Tp0j"
+        "Tp0P", "Tp0T", "Tp0X", "Tp0b", "Tp0f", "Tp0j",
+        // M2 (lowercase variants)
+        "Tp0h", "Tp0l", "Tp0p", "Tp0t", "Tp0x",
+        // M3 / M4
+        "Tp1h", "Tp2h", "Tp3h", "Tp4h",
+        "Te05", "Te09", "Te0D", "Te0L", "Te0P", "Te0S",
     ]
-    private let intelKeys = ["TC0D", "TC0E", "TC0F", "TC0P"]
+    private let intelKeys = ["TC0D", "TC0E", "TC0F", "TC0P", "TC0c", "TC1C", "TC2C"]
     private var resolvedKeys: [String]?
     private var lastValid: Double?
 
@@ -25,7 +31,9 @@ final class TemperatureSampler {
                 resolvedKeys = asWorking
             } else {
                 let intelWorking = intelKeys.filter { probe($0) }
-                resolvedKeys = intelWorking
+                if !intelWorking.isEmpty {
+                    resolvedKeys = intelWorking
+                }
             }
         }
         guard let keys = resolvedKeys, !keys.isEmpty else { return lastValid }

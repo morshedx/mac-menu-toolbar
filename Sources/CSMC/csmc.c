@@ -110,7 +110,7 @@ bool csmc_read(const char *key, double *outValue) {
                                   &output, &outSz);
     if (r != kIOReturnSuccess) return false;
 
-    uint32_t type = output.keyInfo.dataType;
+    uint32_t type = input.keyInfo.dataType;
     const uint8_t *b = output.bytes;
 
     switch (type) {
