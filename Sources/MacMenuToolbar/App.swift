@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import ServiceManagement
 import SwiftUI
 
 @main
@@ -73,6 +74,8 @@ struct MenuBarLabel: View {
     var body: some View {
         HStack(spacing: 6) {
             VStack(spacing: 0) {
+                Text("temp")
+                    .frame(width: 34, alignment: .leading)
                 HStack(spacing: 3) {
                     LucideIconView(name: "thermometer", size: 11)
                     Text(stats.cpuTemp.map { "\(Int($0))°" } ?? "--°")
@@ -99,12 +102,14 @@ struct MenuBarLabel: View {
                 HStack(spacing: 3) {
                     LucideIconView(name: "arrow-up", size: 11)
                     Text(formatRateCompact(stats.uploadSpeed))
-                        .frame(width: 44, alignment: .leading)
+                        .monospacedDigit()
+                        .frame(width: 66, alignment: .leading)
                 }
                 HStack(spacing: 3) {
                     LucideIconView(name: "arrow-down", size: 11)
                     Text(formatRateCompact(stats.downloadSpeed))
-                        .frame(width: 44, alignment: .leading)
+                        .monospacedDigit()
+                        .frame(width: 66, alignment: .leading)
                 }
             }
             .font(.system(size: 11, weight: .regular, design: .monospaced))
@@ -116,6 +121,7 @@ struct MenuBarLabel: View {
 
 struct MenuView: View {
     @ObservedObject var stats: StatsViewModel
+    @State private var openAtLogin: Bool = (SMAppService.mainApp.status == .enabled)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -128,6 +134,22 @@ struct MenuView: View {
             statRow(icon: "arrow-down", label: "Download", value: formatRate(stats.downloadSpeed))
             statRow(icon: "arrow-up",   label: "Upload",   value: formatRate(stats.uploadSpeed))
             Divider()
+            Toggle("Open at Login", isOn: $openAtLogin)
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .onChange(of: openAtLogin) { newValue in
+                    let service = SMAppService.mainApp
+                    do {
+                        if newValue {
+                            if service.status != .enabled { try service.register() }
+                        } else {
+                            if service.status == .enabled { try service.unregister() }
+                        }
+                    } catch {
+                        NSLog("MacMenuToolbar: Open-at-Login toggle failed: \(error.localizedDescription)")
+                        openAtLogin = (service.status == .enabled)
+                    }
+                }
             HStack {
                 Spacer()
                 Button("Quit") { NSApp.terminate(nil) }
@@ -190,9 +212,9 @@ func formatRate(_ bytesPerSec: Double) -> String {
 }
 
 func formatRateCompact(_ bytesPerSec: Double) -> String {
-    let units = ["B", "K", "M", "G"]
-    var v = bytesPerSec
+    let units = ["KB/s", "MB/s", "GB/s"]
+    var v = bytesPerSec / 1024.0
     var i = 0
-    while v >= 500, i < units.count - 1 { v /= 1024; i += 1 }
-    return String(format: v >= 10 ? "%.0f%@" : "%.1f%@", v, units[i])
+    while v >= 999.95, i < units.count - 1 { v /= 1024; i += 1 }
+    return String(format: "%5.1f%@", v, units[i])
 }
